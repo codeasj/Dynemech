@@ -5,9 +5,11 @@ const leadCustomDesignsSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Lead",
   },
-  photosUrl: {
-    type: String,
-  },
+  photoUrl: [
+    {
+      type: String,
+    },
+  ],
   comments: [
     {
       text: {
@@ -24,7 +26,7 @@ const leadCustomDesignsSchema = new mongoose.Schema({
     },
   ],
   addedAt: {
-    type: Date.now(),
+    type: Date,
     required: true,
     default: Date.now(),
   },
@@ -34,5 +36,8 @@ const leadCustomDesignsSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ["Added", "Approved"],
+    required: true,
   },
 });
+
+module.exports = mongoose.model("LeadCustom", leadCustomDesignsSchema);

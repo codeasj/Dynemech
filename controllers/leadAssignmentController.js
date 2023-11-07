@@ -57,7 +57,7 @@ exports.updateLeadAssignment = async (req, res) => {
       { leadId, userId, leadRoleId, createdAt: Date.now(), createdBy }
     );
 
-    if (!raws) {
+    if (!leads) {
       res.status(400).json({
         success: false,
         message: `Data with id:${id} not found`,

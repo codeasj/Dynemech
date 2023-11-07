@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const leadRoleSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
     maxLength: 50,
   },
 

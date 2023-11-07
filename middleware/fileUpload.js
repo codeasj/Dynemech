@@ -18,8 +18,16 @@ const fileFilter = (req, file, cb) => {
   cb(null, true);
 };
 
+const photosFileFilter = (req, file, cb) => {
+  if (!file.originalname.match(/\.(jpg|jpeg|png|svg||gif|docx|doc|pdf)$/)) {
+    return cb(new Error("You can uplaoad only permissible files!"), false);
+  }
+  cb(null, true);
+};
 const upload = multer({ storage, fileFilter });
+const uploadFile = multer({ storage, fileFilter: photosFileFilter });
 module.exports = {
   upload,
+  uploadFile,
   uploadPath,
 };

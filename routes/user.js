@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { upload } = require("../middleware/fileUpload");
 const { uploadpdf } = require("../middleware/catalogueUpload");
+const { uploadFile } = require("../middleware/fileUpload");
 
 //const { isUser, isAdmin } = require("../middleware/authMiddleware");
 
@@ -79,9 +80,33 @@ const {
   getAgent,
   updateAgent,
   deleteAgent,
-  generateResetPasswordReq,
-  resetPasswor,
+  //generateResetPasswordReq,
+  //resetPasswor,
 } = require("../controllers/agentController");
+
+const {
+  createLeadRole,
+  getLeadRole,
+  updateLeadRole,
+  deleteLeadRole,
+} = require("../controllers/leadRoleController");
+
+const {
+  createLeadAssignment,
+  getLeadAssignment,
+  updateLeadAssignment,
+  deleteLeadAssignment,
+} = require("../controllers/leadAssignmentController");
+
+const {
+  createLead,
+  getLead,
+  updateLead,
+  deleteLead,
+  getAssignedLeads,
+} = require("../controllers/leadController");
+
+const { createLeadCustom } = require("../controllers/leadCustomDesign");
 
 router.post("/addRole", createRole);
 router.post("/addUser", upload.single("profilepic"), createUser);
@@ -101,7 +126,18 @@ router.post("/addSkumodel", createSkumodel);
 router.post("/addCampaign", createCampaign);
 router.post("/addAgent", signup);
 router.post("/loginAgent", login);
-router.post("agentForgetPassword", generateResetPasswordReq);
+//router.post("agentForgetPassword", generateResetPasswordReq);
+router.post("/addLeadRole", createLeadRole);
+router.post("/addLeadAssignment", createLeadAssignment);
+router.post(
+  "/addLead",
+  uploadFile.fields([
+    { name: "photos" },
+    { name: "quotationpdfUrl", maxCount: 1 },
+  ]),
+  createLead
+);
+router.post("/addLeadCustom", uploadFile.array("photoUrl"), createLeadCustom);
 
 router.get("/getRole", getRole);
 router.get("/getUser", getUser);
@@ -113,6 +149,10 @@ router.get("/getSku", getSku);
 router.get("/getSkumodel", getSkumodel);
 router.get("/getCampaign", getCampaign);
 router.get("/getAgent", getAgent);
+router.get("/getLeadRole", getLeadRole);
+router.get("/getLeadAssignment", getLeadAssignment);
+router.get("/getLead", getLead);
+router.get("/getAssignedLeads", getAssignedLeads);
 
 router.put("/updateRole/:id", upload.single("profilepic"), updateRole);
 router.put("/updateUser/:id", updateUser);
@@ -129,7 +169,17 @@ router.put("/updateSku/:id", upload.array("photos"), updateSku);
 router.put("/updateSkumodel/:id", updateSkumodel);
 router.put("/updateCampaign/:id", updateCampaign);
 router.put("/updateAgent/:id", updateAgent);
-router.put("/updateAgent", resetPasswor);
+router.put("/updateLeadRole/:id", updateLeadRole);
+router.put("/updateLeadAssignment/:id", updateLeadAssignment);
+//router.put("/updateAgent", resetPasswor);
+router.put(
+  "/updateLead/:id",
+  uploadFile.fields([
+    { name: "photos" },
+    { name: "quotationpdfUrl", maxCount: 1 },
+  ]),
+  updateLead
+);
 
 router.delete("/deleteRole/:id", deleteRole);
 router.delete("/deleteCompany/:id", deleteCompany);
@@ -139,5 +189,8 @@ router.delete("/deleteSku/:id", deleteSku);
 router.delete("/deleteSkumodel/:id", deleteSkumodel);
 router.delete("/deleteCampaign/:id", deleteCampaign);
 router.delete("/deleteAgent/:id", deleteAgent);
+router.delete("/deleteLeadRole/:id", deleteLeadRole);
+router.delete("/deleteLeadAssignment/:id", deleteLeadAssignment);
+router.delete("/deleteLead/:id", deleteLead);
 
 module.exports = router;

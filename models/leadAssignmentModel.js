@@ -1,4 +1,4 @@
-const mongoose = rewuire("mongoose");
+const mongoose = require("mongoose");
 
 const leadAssignmentSchema = new mongoose.Schema({
   leadId: {
