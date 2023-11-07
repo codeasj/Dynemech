@@ -318,71 +318,70 @@ exports.deleteAgent = async (req, res) => {
 //   }
 // };
 
+exports.generateResetPasswordReq = async (req, res) => {
+  const errors = validate(req);
+  if (errors) return res.status(400).json({ status: "error", errors });
+  try {
+    const { email } = req.body;
+    const agent = await Agent.findOne({ email });
+    if (!agent) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Agent Does Not Exist" });
+    }
+    const resetPasswordRequest = await PasswordResetRequest.create({
+      agent,
+    });
+    const resetPasswordLink = `${process.env.CLIENT_URL}/reset-password/${resetPasswordRequest._id}`;
+    console.log({ resetPasswordLink });
+    res.status(200).json({
+      status: "success",
+      message: "Reset Password Link Sent",
+      requestId: resetPasswordRequest._id,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ status: "error", message: err.message });
+  }
+};
 
-// exports.generateResetPasswordReq = async (req, res) => {
-//   const errors = validate(req);
-//   if (errors) return res.status(400).json({ status: "error", errors });
-//   try {
-//     const { email } = req.body;
-//     const agent = await Agent.findOne({ email });
-//     if (!agent) {
-//       return res
-//         .status(400)
-//         .json({ status: "error", message: "Agent Does Not Exist" });
-//     }
-//     const resetPasswordRequest = await PasswordResetRequest.create({
-//       agent,
-//     });
-//     const resetPasswordLink = `${process.env.CLIENT_URL}/reset-password/${resetPasswordRequest._id}`;
-//     console.log({ resetPasswordLink });
-//     res.status(200).json({
-//       status: "success",
-//       message: "Reset Password Link Sent",
-//       requestId: resetPasswordRequest._id,
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ status: "error", message: err.message });
-//   }
-// };
+exports.resetPasswor = async (req, res) => {
+  const errors = validate(req);
+  if (errors) return res.status(400).json({ status: "error", errors });
 
-// exports.resetPasswor = async (req, res) => {
-//   const errors = validate(req);
-//   if (errors) return res.status(400).json({ status: "error", errors });
+  const { password, requestId } = req.body;
+  try {
+    const request = await PasswordResetRequest.findById(requestId);
+    if (!request) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Invalid Request" });
+    }
+    if (request.isUsed) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Link Already Used" });
+    }
+    const isLinkExpired =
+      Date.now().valueOf() - request.createdAt.valueOf() > 1000 * 60 * 10;
+    if (isLinkExpired) {
+      return res.status(400).json({ status: "error", message: "Link Expired" });
+    }
+    const hash = await bcrypt.hash(password, 10);
+    const user = await Agent.findByIdAndUpdate(
+      request.user._id,
+      { password: hash },
+      { new: true }
+    );
+    request.isUsed = true;
+    await request.save();
 
-//   const { password, requestId } = req.body;
-//   try {
-//     const request = await PasswordResetRequest.findById(requestId);
-//     if (!request) {
-//       return res
-//         .status(400)
-//         .json({ status: "error", message: "Invalid Request" });
-//     }
-//     if (request.isUsed) {
-//       return res
-//         .status(400)
-//         .json({ status: "error", message: "Link Already Used" });
-//     }
-//     const isLinkExpired =
-//       Date.now().valueOf() - request.createdAt.valueOf() > 1000 * 60 * 10;
-//     if (isLinkExpired) {
-//       return res.status(400).json({ status: "error", message: "Link Expired" });
-//     }
-//     const hash = await bcrypt.hash(password, 10);
-//     const user = await Agent.findByIdAndUpdate(
-//       request.user._id,
-//       { password: hash },
-//       { new: true }
-//     );
-//     request.isUsed = true;
-//     await request.save();
-
-//     res.status(200).json({
-//       status: "success",
-//       message: "Password Reset Successfully",
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ status: "error", message: err.message });
-//   }
-// };
+    res.status(200).json({
+      status: "success",
+      message: "Password Reset Successfully",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ status: "error", message: err.message });
+  }
+};

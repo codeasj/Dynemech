@@ -80,8 +80,8 @@ const {
   getAgent,
   updateAgent,
   deleteAgent,
-  //generateResetPasswordReq,
-  //resetPasswor,
+  generateResetPasswordReq,
+  resetPasswor,
 } = require("../controllers/agentController");
 
 const {
@@ -126,7 +126,7 @@ router.post("/addSkumodel", createSkumodel);
 router.post("/addCampaign", createCampaign);
 router.post("/addAgent", signup);
 router.post("/loginAgent", login);
-//router.post("agentForgetPassword", generateResetPasswordReq);
+router.post("/agentForgetPassword", generateResetPasswordReq);
 router.post("/addLeadRole", createLeadRole);
 router.post("/addLeadAssignment", createLeadAssignment);
 router.post(
@@ -171,7 +171,7 @@ router.put("/updateCampaign/:id", updateCampaign);
 router.put("/updateAgent/:id", updateAgent);
 router.put("/updateLeadRole/:id", updateLeadRole);
 router.put("/updateLeadAssignment/:id", updateLeadAssignment);
-//router.put("/updateAgent", resetPasswor);
+router.put("/updateAgent", resetPasswor);
 router.put(
   "/updateLead/:id",
   uploadFile.fields([
