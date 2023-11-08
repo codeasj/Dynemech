@@ -179,7 +179,8 @@ exports.updateAgent = async (req, res) => {
         discountPercent,
         addedBy,
         addedAt: Date.now(),
-      }
+      },
+      {new:true}
     );
 
     if (!agent) {

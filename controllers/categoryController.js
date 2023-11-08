@@ -53,7 +53,8 @@ exports.updateCategory = async (req, res) => {
         name,
         createdAt: Date.now(),
         createdBy,
-      }
+      },
+      { new: true }
     );
 
     if (!ctgry) {

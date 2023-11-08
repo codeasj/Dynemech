@@ -95,21 +95,7 @@ exports.updateLeadCustom = async (req, res) => {
       return;
     }
 
-    //Update the Lead model's photos field based on the status
-    // if (status === "Approved" && photoUrl) {
-    //   const leadToUpdate = await Lead.findById(leadId);
-
-    //   if (leadToUpdate) {
-    //     // Check if the photoUrl is not already in the photos array
-    //     if (!leadToUpdate.photos.includes(photoUrl)) {
-    //       leadToUpdate.photos = [...leadToUpdate.photos, photoUrl];
-    //       await leadToUpdate.save();
-    //     }
-    //   }
-    // }
-
     if (status === "Approved") {
-      // If status is "Approved," add photoUrl documents to Lead model's photos field
       const lead = await Lead.findById(leadId);
 
       let existingPhotos = [];
@@ -119,7 +105,6 @@ exports.updateLeadCustom = async (req, res) => {
 
       const updatedPhotos = existingPhotos.concat(documents);
 
-      // Update Lead model's photos field with existing and new documents
       await Lead.updateOne({ _id: leadId }, { photos: updatedPhotos });
     }
 

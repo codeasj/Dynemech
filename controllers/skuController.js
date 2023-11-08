@@ -69,7 +69,8 @@ exports.updateSku = async (req, res) => {
         addedBy,
         addedAt: Date.now(),
         photos: docs,
-      }
+      },
+      { new: true }
     );
 
     if (!resp) {

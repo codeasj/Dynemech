@@ -70,7 +70,9 @@ exports.updateSubcategory = async (req, res) => {
         addedBy,
         addedAt: Date.now(),
         catalogueUrl: documents,
-      }
+      }, {
+        new:true}
+      
     );
     if (!resp) {
       res.status(404).json({

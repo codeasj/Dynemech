@@ -53,8 +53,9 @@ exports.updateLeadAssignment = async (req, res) => {
     const { id } = req.params;
     const { leadId, userId, leadRoleId, createdBy } = req.body;
     const leads = await LeadAssignment.findByIdAndUpdate(
-      { _id: id },
-      { leadId, userId, leadRoleId, createdAt: Date.now(), createdBy }
+      id,
+      { leadId, userId, leadRoleId, createdAt: Date.now(), createdBy },
+      { new: true }
     );
 
     if (!leads) {

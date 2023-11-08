@@ -75,7 +75,8 @@ exports.updateLeadRole = async (req, res) => {
         addQuotation,
         addPricing,
         addSku,
-      }
+      },
+      { new: true }
     );
 
     if (!lead) {

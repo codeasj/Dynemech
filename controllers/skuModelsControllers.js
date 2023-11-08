@@ -53,16 +53,17 @@ exports.updateSkumodel = async (req, res) => {
     const { id } = req.params;
 
     const { name, skuId, specification, addedBy } = req.body;
-
+    console.log(addedBy);
     const resp = await Skumodel.findByIdAndUpdate(
       { _id: id },
       {
         name,
         skuId,
         specification,
-        addedBy,
         addedAt: Date.now(),
-      }
+        addedBy,
+      },
+      { new: true }
     );
 
     if (!resp) {

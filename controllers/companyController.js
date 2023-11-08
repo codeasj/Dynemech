@@ -94,7 +94,8 @@ exports.updateCompany = async (req, res) => {
         addedBy,
         addedAt: Date.now(),
         companyLogo: filename,
-      }
+      },
+      { new: true }
     );
     if (!resp) {
       res.status(404).json({

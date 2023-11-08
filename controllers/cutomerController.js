@@ -110,7 +110,8 @@ exports.updateCustomer = async (req, res) => {
         addedBy,
         status,
         addedAt: Date.now(),
-      }
+      },
+      { new: true }
     );
 
     if (!resp) {

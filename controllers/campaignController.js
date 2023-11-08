@@ -50,14 +50,18 @@ exports.updateCampaign = async (req, res) => {
     const { id } = req.params;
     const { name, place, startDate, endDate, addedBy } = req.body;
 
-    const resp = await Campaign.findByIdAndUpdate(id, {
-      name,
-      place,
-      startDate,
-      endDate,
-      addeedAt: Date.now(),
-      addedBy,
-    });
+    const resp = await Campaign.findByIdAndUpdate(
+      id,
+      {
+        name,
+        place,
+        startDate,
+        endDate,
+        addeedAt: Date.now(),
+        addedBy,
+      },
+      { new: true }
+    );
     if (!resp) {
       res.status(404).json({
         success: false,

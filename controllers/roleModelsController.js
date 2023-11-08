@@ -280,7 +280,8 @@ exports.updateRole = async (req, res) => {
         getCostingSheet,
         createdAt: Date.now(),
         createdBy,
-      }
+      },
+      { new: true }
     );
 
     if (!roles) {

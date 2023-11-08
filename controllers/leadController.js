@@ -31,8 +31,7 @@ exports.createLead = async (req, res) => {
       req.files && req.files.photos
         ? `${basePhotoUrl}/${req.files.photos[0].filename}`
         : "";
- 
-    
+
     console.log(JSON.stringify(docs));
     console.log(photos);
 
@@ -137,6 +136,9 @@ exports.updateLead = async (req, res) => {
         addedAt: Date.now(),
         photos,
         quotationpdfUrl: docs,
+      },
+      {
+        new: true,
       }
     );
     if (!resp) {
