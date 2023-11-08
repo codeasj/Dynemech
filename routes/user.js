@@ -106,7 +106,12 @@ const {
   getAssignedLeads,
 } = require("../controllers/leadController");
 
-const { createLeadCustom } = require("../controllers/leadCustomDesign");
+const {
+  createLeadCustom,
+  getLeadCustom,
+  updateLeadCustom,
+  deleteLeadCustom,
+} = require("../controllers/leadCustomDesign");
 
 router.post("/addRole", createRole);
 router.post("/addUser", upload.single("profilepic"), createUser);
@@ -153,6 +158,7 @@ router.get("/getLeadRole", getLeadRole);
 router.get("/getLeadAssignment", getLeadAssignment);
 router.get("/getLead", getLead);
 router.get("/getAssignedLeads", getAssignedLeads);
+router.get("/getLeadCustom", getLeadCustom);
 
 router.put("/updateRole/:id", upload.single("profilepic"), updateRole);
 router.put("/updateUser/:id", updateUser);
@@ -180,6 +186,11 @@ router.put(
   ]),
   updateLead
 );
+router.put(
+  "/updateLeadCustom/:id",
+  uploadFile.array("photoUrl"),
+  updateLeadCustom
+);
 
 router.delete("/deleteRole/:id", deleteRole);
 router.delete("/deleteCompany/:id", deleteCompany);
@@ -192,5 +203,6 @@ router.delete("/deleteAgent/:id", deleteAgent);
 router.delete("/deleteLeadRole/:id", deleteLeadRole);
 router.delete("/deleteLeadAssignment/:id", deleteLeadAssignment);
 router.delete("/deleteLead/:id", deleteLead);
+router.delete("/deleteLeadCustom/:id", deleteLeadCustom);
 
 module.exports = router;

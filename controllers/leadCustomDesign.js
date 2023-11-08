@@ -1,21 +1,38 @@
 const LeadCustom = require("../models/leadCustomDesignsModel");
-
+const Lead = require("../models/leadModel");
 //add lead custom design
 exports.createLeadCustom = async (req, res) => {
   try {
-    const { leadId, photoUrl, comments, addedBy, status } = req.body;
+    const { leadId, comments, addedBy, status } = req.body;
 
     console.log(req.body);
     console.log(req.files);
-    const documents = req.files.map((doc) => doc.filename);
 
+    const documents = req.files.map((doc) => doc.path);
+    console.log(documents);
     const response = await LeadCustom.create({
       leadId,
-      photoUrl: documents,
       comments,
       addedBy,
       status,
+      photoUrl: documents,
     });
+
+    if (status === "Approved") {
+      // If status is "Approved," add photoUrl documents to Lead model's photos field
+      const lead = await Lead.findById(leadId);
+
+      let existingPhotos = [];
+      if (lead && lead.photos && Array.isArray(lead.photos)) {
+        existingPhotos = lead.photos;
+      }
+
+      const updatedPhotos = existingPhotos.concat(documents);
+
+      // Update Lead model's photos field with existing and new documents
+      await Lead.updateOne({ _id: leadId }, { photos: updatedPhotos });
+    }
+
     res.status(200).json({
       success: true,
       data: response,
@@ -55,17 +72,19 @@ exports.updateLeadCustom = async (req, res) => {
   try {
     const { id } = req.params;
     const { leadId, photoUrl, comments, addedBy, status } = req.body;
-
+    const documents = req.files.map((doc) => doc.path);
+    console.log(documents);
     const lead = await LeadCustom.findByIdAndUpdate(
-      { _id: id },
+      id,
       {
         leadId,
-        photoUrl,
+        photoUrl: documents,
         comments,
         addedBy,
         status,
         createdAt: Date.now(),
-      }
+      },
+      { new: true }
     );
 
     if (!lead) {
@@ -75,6 +94,35 @@ exports.updateLeadCustom = async (req, res) => {
       });
       return;
     }
+
+    //Update the Lead model's photos field based on the status
+    // if (status === "Approved" && photoUrl) {
+    //   const leadToUpdate = await Lead.findById(leadId);
+
+    //   if (leadToUpdate) {
+    //     // Check if the photoUrl is not already in the photos array
+    //     if (!leadToUpdate.photos.includes(photoUrl)) {
+    //       leadToUpdate.photos = [...leadToUpdate.photos, photoUrl];
+    //       await leadToUpdate.save();
+    //     }
+    //   }
+    // }
+
+    if (status === "Approved") {
+      // If status is "Approved," add photoUrl documents to Lead model's photos field
+      const lead = await Lead.findById(leadId);
+
+      let existingPhotos = [];
+      if (lead && lead.photos && Array.isArray(lead.photos)) {
+        existingPhotos = lead.photos;
+      }
+
+      const updatedPhotos = existingPhotos.concat(documents);
+
+      // Update Lead model's photos field with existing and new documents
+      await Lead.updateOne({ _id: leadId }, { photos: updatedPhotos });
+    }
+
     res.status(200).json({
       success: true,
       data: lead,
@@ -90,7 +138,7 @@ exports.updateLeadCustom = async (req, res) => {
   }
 };
 
-//delete defaut size
+//delete Lead Custom
 exports.deleteLeadCustom = async (req, res) => {
   try {
     const { id } = req.params;
@@ -106,7 +154,7 @@ exports.deleteLeadCustom = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "LeadCustom Design data deleted succesfully",
+      message: "Lead Custom Design data deleted succesfully",
     });
   } catch (err) {
     console.error(err);

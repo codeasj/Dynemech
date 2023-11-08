@@ -1,5 +1,6 @@
 const Lead = require("../models/leadModel");
 const LeadAssignment = require("../models/leadAssignmentModel");
+const path = require("path");
 
 //add leads
 exports.createLead = async (req, res) => {
@@ -11,17 +12,30 @@ exports.createLead = async (req, res) => {
       leadSource,
       firstContactDate,
       Status,
-      Comments,
-      Sku,
+      comments,
+      sku,
       pricing,
-      AddedBy,
-      UpdatedBy,
+      addedBy,
+      updatedBy,
     } = req.body;
 
-    console.log(JSON.stringify(req.body));
+    const basePhotoUrl = path.dirname(__dirname) + "/uploads";
     console.log(req.files);
-    const docs = req.files.quotationpdfUrl.map((doc) => doc.filename);
-    console.log(docs);
+
+    const docs =
+      req.files && req.files.quotationpdfUrl
+        ? req.files.quotationpdfUrl.map((doc) => `${doc.path}`)
+        : [];
+
+    const photos =
+      req.files && req.files.photos
+        ? `${basePhotoUrl}/${req.files.photos[0].filename}`
+        : "";
+ 
+    
+    console.log(JSON.stringify(docs));
+    console.log(photos);
+
     const response = await Lead.create({
       customerId,
       campaignId,
@@ -29,13 +43,13 @@ exports.createLead = async (req, res) => {
       leadSource,
       firstContactDate,
       Status,
-      comments: Comments,
-      sku: Sku,
+      comments,
+      sku,
       pricing,
-      AddedBy,
-      UpdatedBy,
-      photos: req.files.photos[0].filename,
-      quotationpdfUrl: docs, //req.files.quotationPdfUrl[0].filename,
+      addedBy,
+      updatedBy,
+      photos,
+      quotationpdfUrl: docs,
     });
 
     res.status(200).json({
@@ -89,8 +103,21 @@ exports.updateLead = async (req, res) => {
       updatedBy,
     } = req.body;
 
-    const docs = req.files.quotationpdfUrl.map((doc) => doc.filename);
+    const basePhotoUrl = path.dirname(__dirname) + "/uploads";
+    console.log(req.files);
+
+    const docs =
+      req.files && req.files.quotationpdfUrl
+        ? req.files.quotationpdfUrl.map((doc) => `${doc.path}`)
+        : [];
+
+    const photos =
+      req.files && req.files.photos
+        ? `${basePhotoUrl}/${req.files.photos[0].filename}`
+        : "";
+
     console.log(docs);
+    console.log(photos);
 
     const resp = await Lead.findByIdAndUpdate(
       { _id: id },
@@ -108,8 +135,8 @@ exports.updateLead = async (req, res) => {
         updatedBy,
         updatedAt: Date.now(),
         addedAt: Date.now(),
-        photos: req.files.photos[0].filename,
-        quotationpdfUrl: docs, //req.files.quotationPdfUrl[0].filename,
+        photos,
+        quotationpdfUrl: docs,
       }
     );
     if (!resp) {
@@ -134,11 +161,11 @@ exports.updateLead = async (req, res) => {
   }
 };
 
-//delete Controller
+delete Controller;
 exports.deleteLead = async (req, res) => {
   try {
     const { id } = req.params;
-    const dltd = await Lead.findByIdAndDelete({ _id: id });
+    const dltd = await Lead.findByIdAndDelete(id);
     if (!dltd) {
       res.status(400).json({
         success: false,
@@ -146,6 +173,7 @@ exports.deleteLead = async (req, res) => {
       });
       return;
     }
+
     res.status(200).json({
       success: true,
       message: "Lead data deleted succesfully",
@@ -160,25 +188,42 @@ exports.deleteLead = async (req, res) => {
   }
 };
 
-//get assigned leads
 exports.getAssignedLeads = async (req, res) => {
   try {
-    const ls = await LeadAssignment.find({});
-    const lead = await Lead.findOne({
-      _id: { $in: ls.map((item) => item._id) },
-    });
-    console.log(lead);
+    const leadAssignments = await LeadAssignment.find({});
+
+    if (leadAssignments.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No assigned leads found",
+      });
+    }
+
+    const leadIds = leadAssignments.map((item) => item.leadId);
+    const leads = await Lead.find({ _id: { $in: leadIds } });
+
+    if (leads.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No leads found for the assigned IDs",
+      });
+    }
+
+    console.log(leads); // Logging the fetched leads
+
     return res.status(200).json({
       success: true,
-      data: lead,
-      message: "Asssigned leads fetched succesfully",
+      data: leads,
+      message: "Assigned leads fetched successfully",
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      error: err.message,
-      message: "Server Error",
+      error: "Server Error",
+      message: err.message,
     });
   }
 };
